@@ -13,7 +13,7 @@
 <body>
     <div class="container" id="app">
         <div class="row flex-middle" style="height: 100vh;">
-            <div class="sm-12 m-6 col align-middle">
+            <div class="sm-12 col align-middle">
                 <div class="card">
                     <div class="card-header">নামাজের সময় সূচি</div>
                     <div class="card-body">
@@ -60,8 +60,8 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="vue.js"></script>
+    <script src="axios.min.js"></script>
     <script>
 
         var app = new Vue({
@@ -84,7 +84,13 @@
                         });
 
                         this.data = all_data;
+                        localStorage['full_month'] = JSON.stringify(all_data);
                         // console.log(all_data);
+                    }).catch(error => {
+                        var stored = localStorage['full_month'];
+                        if (stored) {
+                            this.data = JSON.parse(stored);
+                        }
                     })
             }
 

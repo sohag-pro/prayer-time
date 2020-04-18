@@ -13,11 +13,11 @@
 <body>
     <div class="container" id="app">
         <div class="row flex-middle" style="height: 100vh;">
-            <div class="sm-12 m-6 col align-middle">
+            <div class="sm-12 col align-middle">
                 <div class="card">
                     <div class="card-header">নামাজের সময় সূচি {{hijri_date}}</div>
                     <div class="card-body">
-                        <table>
+                        <table class="table-hover">
                             <thead>
                                 <tr>
                                     <td>ওয়াক্ত</td>
@@ -86,8 +86,8 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="vue.js"></script>
+    <script src="axios.min.js"></script>
     <script>
         var m = new Date();
         var today_date =
@@ -120,8 +120,11 @@
                                 Object.keys(today_data).forEach(function (key) { today_data[key] = tConvert(today_data[key].replace(" (+06)", "")) });
                                 this.today = today_data;
 
-                                let hijri = response.data.data[i].date.hijri.day + ' ' + response.data.data[i].date.hijri.month.en + ', ' + response.data.data[i].date.hijri.year;
+                                let hijri = response.data.data[i].date.hijri.day + ' ' + response.data.data[i].date.hijri.month.en + ', ' + response.data.data[i].date.hijri.year + ' / ' + response.data.data[i].date.readable;
                                 this.hijri_date = hijri;
+
+                                localStorage['today'] = JSON.stringify(today_data);
+                                localStorage['hijri'] = JSON.stringify(hijri);
 
                             }
                             if (response.data.data[i].date.gregorian.date == tomorrow_date) {
@@ -129,8 +132,23 @@
                                 let tomorrow_data = response.data.data[i].timings;
                                 Object.keys(tomorrow_data).forEach(function (key) { tomorrow_data[key] = tConvert(tomorrow_data[key].replace(" (+06)", "")) });
                                 this.tomorrow = tomorrow_data;
-
+                                localStorage['tomorrow'] = JSON.stringify(tomorrow_data);
                             }
+                        }
+                    }).catch(error => {
+                        var stored_today = localStorage['today'];
+                        if (stored_today) {
+                            this.today = JSON.parse(stored_today);
+                        }
+
+                        var stored_tomorrow = localStorage['tomorrow'];
+                        if (stored_tomorrow) {
+                            this.tomorrow = JSON.parse(stored_tomorrow);
+                        }
+
+                        var stored_hijri = localStorage['hijri'];
+                        if (stored_hijri) {
+                            this.hijri_date = JSON.parse(stored_hijri);
                         }
                     })
             }
