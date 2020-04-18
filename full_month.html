@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="paper.min.css">
+    <link rel="stylesheet" href="style.css">
+    <title>নামাজের সময় সূচি</title>
+</head>
+
+<body>
+    <div class="container" id="app">
+        <div class="row flex-middle" style="height: 100vh;">
+            <div class="sm-12 m-6 col align-middle">
+                <div class="card">
+                    <div class="card-header">নামাজের সময় সূচি</div>
+                    <div class="card-body">
+                        <table class="table-hover">
+                            <thead>
+                                <tr>
+                                    <td>তারিখ</td>
+                                    <td>সেহেরী</td>
+                                    <td>ফজর</td>
+                                    <td>সূর্য উদয়</td>
+                                    <td>যোহর</td>
+                                    <td>আসর</td>
+                                    <td>মাগরিব</td>
+                                    <td>এশা</td>
+                                    <td>মধ্যরাত</td>
+                                </tr>
+                            </thead>
+                            <tbody v-if="data">
+                                <tr v-for="day in data">
+                                    <td>{{day.date.readable}}</td>
+                                    <td>{{day.timings.Imsak}}</td>
+                                    <td>{{day.timings.Fajr}}</td>
+                                    <td>{{day.timings.Sunrise}}</td>
+                                    <td>{{day.timings.Dhuhr}}</td>
+                                    <td>{{day.timings.Asr}}</td>
+                                    <td>{{day.timings.Maghrib}}</td>
+                                    <td>{{day.timings.Isha}}</td>
+                                    <td>{{day.timings.Midnight}}</td>
+                                </tr>
+                            </tbody>
+                            <tbody v-else>
+                                <tr>
+                                    <td colspan="9">
+                                        loading . . .
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <a href="index.html" class="btn-small paper-btn">আজকে</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+
+        var app = new Vue({
+            el: '#app',
+            data: {
+                data: null,
+            },
+            computed: {
+
+            },
+            mounted() {
+                axios.get("http://api.aladhan.com/v1/calendar?latitude=23.7180189&longitude=90.2989933&method=1&timezonestring=Asia/Dhaka")
+                    .then(response => {
+
+                        let all_data = response.data.data;
+                        Object.keys(all_data).forEach(function (key) {
+
+                            let timing_data = all_data[key].timings;
+                            Object.keys(timing_data).forEach(function (key) { timing_data[key] = tConvert(timing_data[key].replace(" (+06)", "")) });
+                        });
+
+                        this.data = all_data;
+                        // console.log(all_data);
+                    })
+            }
+
+        })
+        function tConvert(time) {
+            // Check correct time format and split into components
+            time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)?$/) || [time];
+
+            if (time.length > 1) { // If time format correct
+                time = time.slice(1);  // Remove full string match value
+                time[5] = +time[0] < 12 ? ' AM' : ' PM'; // Set AM/PM
+                time[0] = +time[0] % 12 || 12; // Adjust hours
+            }
+            return time.join(''); // return adjusted time or original string
+        }
+
+    </script>
+</body>
+
+</html>

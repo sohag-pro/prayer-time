@@ -1,0 +1,12 @@
+@font-face {
+    font-family: BenSenHandwriting;
+    src: url(./BenSenHandwriting.ttf);
+  }
+
+  *{
+    font-family: BenSenHandwriting !important;
+  }
+
+  td{
+    font-size: smaller;
+  }

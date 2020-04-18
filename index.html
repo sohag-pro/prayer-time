@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="paper.min.css">
+    <link rel="stylesheet" href="style.css">
+    <title>নামাজের সময় সূচি</title>
+</head>
+
+<body>
+    <div class="container" id="app">
+        <div class="row flex-middle" style="height: 100vh;">
+            <div class="sm-12 m-6 col align-middle">
+                <div class="card">
+                    <div class="card-header">নামাজের সময় সূচি {{hijri_date}}</div>
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <td>ওয়াক্ত</td>
+                                    <td>আজকে</td>
+                                    <td>আগামীকাল</td>
+                                </tr>
+                            </thead>
+                            <tbody v-if="today">
+                                <tr>
+                                    <td>সেহেরীঃ </td>
+                                    <td>{{today.Imsak}}</td>
+                                    <td>{{tomorrow.Imsak}}</td>
+                                </tr>
+                                <tr>
+                                    <td>ফজরঃ </td>
+                                    <td>{{today.Fajr}}</td>
+                                    <td>{{tomorrow.Fajr}}</td>
+                                </tr>
+                                <tr>
+                                    <td>সূর্য উদয়ঃ </td>
+                                    <td>{{today.Sunrise}}</td>
+                                    <td>{{tomorrow.Sunrise}}</td>
+                                </tr>
+                                <tr>
+                                    <td>যোহরঃ </td>
+                                    <td>{{today.Dhuhr}}</td>
+                                    <td>{{tomorrow.Dhuhr}}</td>
+                                </tr>
+                                <tr>
+                                    <td>আসরঃ </td>
+                                    <td>{{today.Asr}}</td>
+                                    <td>{{tomorrow.Asr}}</td>
+                                </tr>
+                                <tr>
+                                    <td>সূর্যাস্তঃ</td>
+                                    <td>{{today.Sunset}}</td>
+                                    <td>{{tomorrow.Sunset}}</td>
+                                </tr>
+                                <tr>
+                                    <td>মাগরিবঃ </td>
+                                    <td>{{today.Maghrib}}</td>
+                                    <td>{{tomorrow.Maghrib}}</td>
+                                </tr>
+                                <tr>
+                                    <td>এশাঃ </td>
+                                    <td>{{today.Isha}}</td>
+                                    <td>{{tomorrow.Isha}}</td>
+                                </tr>
+                                <tr>
+                                    <td>মধ্যরাতঃ </td>
+                                    <td>{{today.Midnight}}</td>
+                                    <td>{{tomorrow.Midnight}}</td>
+                                </tr>
+                            </tbody>
+                            <tbody v-else>
+                                <tr>
+                                    <td colspan="3">Loading . . .</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <a href="full_month.html" class="btn-small paper-btn">সম্পূর্ণ মাস</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        var m = new Date();
+        var today_date =
+            ("0" + m.getUTCDate()).slice(-2) + "-" +
+            ("0" + (m.getUTCMonth() + 1)).slice(-2) + "-" +
+            m.getUTCFullYear();
+        var tomorrow_date =
+            ("0" + (m.getUTCDate() + 1)).slice(-2) + "-" +
+            ("0" + (m.getUTCMonth() + 1)).slice(-2) + "-" +
+            m.getUTCFullYear();
+
+        var app = new Vue({
+            el: '#app',
+            data: {
+                today: null,
+                tomorrow: [],
+                hijri_date: null
+            },
+            computed: {
+
+            },
+            mounted() {
+                axios.get("http://api.aladhan.com/v1/calendar?latitude=23.7180189&longitude=90.2989933&method=1&timezonestring=Asia/Dhaka")
+                    .then(response => {
+                        // this.results = response.data.results
+                        for (var i = 0; i < response.data.data.length; i++) {
+                            if (response.data.data[i].date.gregorian.date == today_date) {
+
+                                let today_data = response.data.data[i].timings;
+                                Object.keys(today_data).forEach(function (key) { today_data[key] = tConvert(today_data[key].replace(" (+06)", "")) });
+                                this.today = today_data;
+
+                                let hijri = response.data.data[i].date.hijri.day + ' ' + response.data.data[i].date.hijri.month.en + ', ' + response.data.data[i].date.hijri.year;
+                                this.hijri_date = hijri;
+
+                            }
+                            if (response.data.data[i].date.gregorian.date == tomorrow_date) {
+
+                                let tomorrow_data = response.data.data[i].timings;
+                                Object.keys(tomorrow_data).forEach(function (key) { tomorrow_data[key] = tConvert(tomorrow_data[key].replace(" (+06)", "")) });
+                                this.tomorrow = tomorrow_data;
+
+                            }
+                        }
+                    })
+            }
+
+        })
+        function tConvert(time) {
+            // Check correct time format and split into components
+            time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)?$/) || [time];
+
+            if (time.length > 1) { // If time format correct
+                time = time.slice(1);  // Remove full string match value
+                time[5] = +time[0] < 12 ? ' AM' : ' PM'; // Set AM/PM
+                time[0] = +time[0] % 12 || 12; // Adjust hours
+            }
+            return time.join(''); // return adjusted time or original string
+        }
+
+    </script>
+</body>
+
+</html>
