@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="paper.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/paper.min.css">
+    <link rel="stylesheet" href="css/style.css">
     <title>নামাজের সময় সূচি</title>
 </head>
 
@@ -20,9 +20,9 @@
                         <table class="table-hover">
                             <thead>
                                 <tr>
-                                    <td>ওয়াক্ত</td>
-                                    <td>আজকে</td>
-                                    <td>আগামীকাল</td>
+                                    <th>ওয়াক্ত</th>
+                                    <th>আজকে</th>
+                                    <th>আগামীকাল</th>
                                 </tr>
                             </thead>
                             <tbody v-if="today">
@@ -86,8 +86,8 @@
             </div>
         </div>
     </div>
-    <script src="vue.js"></script>
-    <script src="axios.min.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.min.js"></script>
     <script>
         var m = new Date();
         var today_date =
