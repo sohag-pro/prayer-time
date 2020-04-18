@@ -73,7 +73,7 @@
 
             },
             mounted() {
-                axios.get("http://api.aladhan.com/v1/calendar?latitude=23.7180189&longitude=90.2989933&method=1&timezonestring=Asia/Dhaka")
+                axios.get("https://api.aladhan.com/v1/calendar?latitude=23.7180189&longitude=90.2989933&method=1&timezonestring=Asia/Dhaka")
                     .then(response => {
 
                         let all_data = response.data.data;
